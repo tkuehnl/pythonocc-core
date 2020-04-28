@@ -116,6 +116,13 @@ class TestExtendDataExchange(unittest.TestCase):
                        get_test_fullname("sample_binary.stl"),
                        mode="binary")
 
+    def test_x3d(self):
+        write_x3d_file(A_TOPODS_SHAPE, path=SAMPLES_DIRECTORY,
+                       filename="sample_x3d.x3d")
+        # then check xml formatting against the DTD schema definition
+        if HAVE_LXML:
+            etree.parse(get_test_fullname("sample_x3d.x3d"))
+
 
 def suite():
     test_suite = unittest.TestSuite()
