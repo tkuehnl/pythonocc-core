@@ -30,8 +30,17 @@ from OCC.Extend.DataExchange import (read_step_file,
                                      write_step_file,
                                      write_stl_file,
                                      write_iges_file,
-                                     export_shape_to_svg)
+                                     export_shape_to_svg,
+                                     write_x3d_file,
+                                     X3DScene)
 
+# lxml is used to perform x3d checking
+try:
+    from lxml import etree
+    HAVE_LXML = True
+    print("lxml found, perform x3d check.")
+except ImportError:
+    HAVE_LXML = False
 
 SAMPLES_DIRECTORY = os.path.join('.', 'test_io')
 
@@ -122,6 +131,20 @@ class TestExtendDataExchange(unittest.TestCase):
         # then check xml formatting against the DTD schema definition
         if HAVE_LXML:
             etree.parse(get_test_fullname("sample_x3d.x3d"))
+
+
+    def test_x3d(self):
+        write_x3d_file(A_TOPODS_SHAPE, path=SAMPLES_DIRECTORY,
+                       filename="sample_x3d.x3d")
+        # then check xml formatting against the DTD schema definition
+        if HAVE_LXML:
+            etree.parse(get_test_fullname("sample_x3d.x3d"))
+
+
+    def test_x3d_indexedgeometry(self):
+        an_x3d_exporter = X3DScene()
+        an_x3d_exporter.add_shape(A_TOPODS_SHAPE)
+        an_x3d_exporter.export_to_single_file(os.path.join(SAMPLES_DIRECTORY, "sample_indexed_x3d.x3d"))
 
 
 def suite():

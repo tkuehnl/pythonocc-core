@@ -69,24 +69,6 @@ class TestTesselator(unittest.TestCase):
         self.assertGreater(tess.ObjGetNormalCount(), 10)
         self.assertLess(tess.ObjGetNormalCount(), 100)
 
-    def test_export_to_x3d(self):
-        """ 3rd test : export a sphere to X3D file format """
-        a_sphere = BRepPrimAPI_MakeSphere(10.).Shape()
-        tess = ShapeTesselator(a_sphere)
-        tess.Compute()
-        tess.ExportShapeToX3D(os.path.join("test_io", "sphere.x3d"))
-        self.assertTrue(os.path.exists(os.path.join("test_io", "sphere.x3d")))
-
-    def test_export_to_x3d_TriangleSet(self):
-        """ 3rd test : export a sphere to an X3D TriangleSet triangle mesh """
-        a_sphere = BRepPrimAPI_MakeBox(10., 10., 10.).Shape()
-        sphere_tess = ShapeTesselator(a_sphere)
-        sphere_tess.Compute()
-        sphere_triangle_set_string = sphere_tess.ExportShapeToX3DTriangleSet()
-        self.assertTrue(sphere_triangle_set_string.startswith("<TriangleSet"))
-        self.assertTrue("0 10 0" in sphere_triangle_set_string)  # a vertex
-        self.assertTrue("0 0 1" in sphere_triangle_set_string)  # a normal
-
     def test_export_to_3js_JSON(self):
         a_box = BRepPrimAPI_MakeBox(10, 20, 30).Shape()
         tess = ShapeTesselator(a_box)
@@ -98,18 +80,6 @@ class TestTesselator(unittest.TestCase):
         dico = json.loads(JSON_str)
         # after that, check that the number of vertices is ok
         self.assertEqual(len(dico["data"]["attributes"]["position"]["array"]), 36*3)
-
-    def test_x3d_file_is_valid_xml(self):
-        """ use ElementTree to parse X3D output """
-        another_torus = BRepPrimAPI_MakeTorus(10, 4).Shape()
-        torus_tess = ShapeTesselator(another_torus)
-        torus_tess.Compute()
-        output_x3d_filename = os.path.join("test_io", "torus.x3d")
-        torus_tess.ExportShapeToX3D(output_x3d_filename)
-        self.assertTrue(os.path.exists(output_x3d_filename))
-        with open(output_x3d_filename, "r") as x3d_file:
-            x3d_content = x3d_file.read()
-            ET.fromstring(x3d_content)  # raise an exception if not valid xml
 
     def test_tesselate_STEP_file(self):
         """ loads a step file, tesselate. The as1_pe_203 contains
