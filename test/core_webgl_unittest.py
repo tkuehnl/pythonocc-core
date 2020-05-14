@@ -70,9 +70,7 @@ class TestWebGL(unittest.TestCase):
         """ Render a simple torus using x3dom
         """
         my_x3dom_renderer = x3dom_renderer.X3DomRenderer()
-        dict_shape, dict_edge = my_x3dom_renderer.DisplayShape(torus_shp)
-        self.assertTrue(dict_shape)
-        self.assertTrue(not dict_edge)
+        my_x3dom_renderer.DisplayShape(torus_shp)
 
     def test_threejs_edge(self):
         """ Test: threejs 10 random boxes
@@ -97,18 +95,14 @@ class TestWebGL(unittest.TestCase):
         """
         my_x3dom_renderer = x3dom_renderer.X3DomRenderer()
         for edg in TopologyExplorer(torus_shp).edges():
-            dict_shape, dict_edge = my_x3dom_renderer.DisplayShape(edg, mesh_quality=1.0)
-            self.assertTrue(not dict_shape)
-            self.assertTrue(dict_edge)
+            my_x3dom_renderer.DisplayShape(edg, mesh_quality=1.0)
 
     def test_x3d_wire(self):
         """ Test: threejs 10 random boxes
         """
         my_x3dom_renderer = x3dom_renderer.X3DomRenderer()
         for wire in TopologyExplorer(torus_shp).wires():
-            dict_shape, dict_edge = my_x3dom_renderer.DisplayShape(wire, mesh_quality=1.0)
-            self.assertTrue(not dict_shape)
-            self.assertTrue(dict_edge)
+            my_x3dom_renderer.DisplayShape(wire, mesh_quality=1.0)
 
 def suite():
     suite = unittest.TestSuite()
