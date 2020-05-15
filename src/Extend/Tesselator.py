@@ -54,6 +54,8 @@ class WireDiscretizer:
         self._wire = a_wire
         self._pnts = []
 
+        self.discretize()
+
     def get_points(self):
         return self._pnts
 

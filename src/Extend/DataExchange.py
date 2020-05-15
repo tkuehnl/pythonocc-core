@@ -658,15 +658,26 @@ class X3DCurveExporter(X3DBaseExporter):
     LineSet instance."""
     def __init__(self, *kargs):
         super().__init__(*kargs)
+        self._cd = None
 
     def compute(self):
         shape_type = self._shape.ShapeType()
         if shape_type == TopAbs_ShapeEnum.TopAbs_EDGE:
-            cd = EdgeDiscretizer(self._shape)
+            self._cd = EdgeDiscretizer(self._shape)
         elif shape_type == TopAbs_ShapeEnum.TopAbs_WIRE:
-            cd = WireDiscretizer(self._shape)
+            self._cd = WireDiscretizer(self._shape)
         else:
             raise AssertionError('you must provide an edge or a wire to the X3DCurveExporter')
+
+
+    def to_x3dfile_string(self):
+        edge_point_set = self._cd.get_points()
+        str_x3d_to_return = "\t<Shape><LineSet vertexCount='%i'>" % len(edge_point_set)
+        str_x3d_to_return += "<Coordinate point='"
+        for p in edge_point_set:
+            str_x3d_to_return += "%g %g %g " % (p[0], p[1], p[2])
+        str_x3d_to_return += "'/></LineSet></Shape>\n"
+        return str_x3d_to_return
 
 
 class X3DShapeExporter(X3DBaseExporter):
@@ -839,13 +850,6 @@ def approximate_listoffloat_to_str(list_of_floats, ndigits=4, epsilon=1e-3):
 #     return str_x3d_to_return
 
 
-# def export_edge_to_lineset(edge_point_set):
-#     str_x3d_to_return = "\t<LineSet vertexCount='%i'>" % len(edge_point_set)
-#     str_x3d_to_return += "<Coordinate point='"
-#     for p in edge_point_set:
-#         str_x3d_to_return += "%g %g %g " % (p[0], p[1], p[2])
-#     str_x3d_to_return += "'/></LineSet>\n"
-#     return str_x3d_to_return
 
 
 # def lineset_to_x3d_string(str_linesets, header=True, footer=True, ils_id=0):
@@ -892,6 +896,8 @@ class X3DScene:
         if shape_type in [TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_WIRE]:
             new_curve = X3DCurveExporter(a_topods_shape)
             new_curve.compute()
+            shape_str = new_curve.to_x3dfile_string()
+            self._shapes.append(shape_str)
         else:
             new_shp = X3DShapeExporter(a_topods_shape, color=shape_color)
             new_shp.compute()
